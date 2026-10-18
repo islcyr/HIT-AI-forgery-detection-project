@@ -1,0 +1,361 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Detailed audio ground-truth labels v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "sample_id",
+    "category",
+    "utterance_label",
+    "audio",
+    "source",
+    "annotation",
+    "segments",
+    "summary"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "sample_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "category": {
+      "enum": [
+        "bonafide",
+        "fullspoof",
+        "partialspoof"
+      ]
+    },
+    "utterance_label": {
+      "enum": [
+        "bonafide",
+        "spoof"
+      ]
+    },
+    "audio": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "duration_sec",
+        "sample_rate_hz",
+        "channels",
+        "num_samples",
+        "bits_per_sample",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "duration_sec": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "sample_rate_hz": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "channels": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "num_samples": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "bits_per_sample": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dataset",
+        "version",
+        "record_url",
+        "original_id",
+        "original_split",
+        "release_part",
+        "speaker_id",
+        "reference_speaker_key",
+        "attack_id",
+        "attack_name",
+        "source_audio_relative_path",
+        "protocol_line"
+      ],
+      "properties": {
+        "dataset": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "record_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "original_id": {
+          "type": "string"
+        },
+        "original_split": {
+          "type": "string"
+        },
+        "release_part": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "speaker_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reference_speaker_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "attack_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "attack_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_audio_relative_path": {
+          "type": "string"
+        },
+        "protocol_line": {
+          "type": "string"
+        }
+      }
+    },
+    "annotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "time_unit",
+        "interval_convention",
+        "origin_sec",
+        "non_speech_annotation_available",
+        "source_file",
+        "source_sha256",
+        "source_duration_sec",
+        "normalizations",
+        "annotated_duration_sec",
+        "unannotated_duration_sec"
+      ],
+      "properties": {
+        "status": {
+          "const": "official_temporal_annotations"
+        },
+        "time_unit": {
+          "const": "seconds"
+        },
+        "interval_convention": {
+          "const": "[start,end)"
+        },
+        "origin_sec": {
+          "const": 0
+        },
+        "non_speech_annotation_available": {
+          "type": "boolean"
+        },
+        "source_file": {
+          "type": "string"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "source_duration_sec": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "normalizations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "original_end_sec",
+              "normalized_end_sec",
+              "delta_sec",
+              "reason"
+            ],
+            "properties": {
+              "type": {
+                "const": "rounded_terminal_boundary_to_audio_duration"
+              },
+              "original_end_sec": {
+                "type": "number",
+                "minimum": 0
+              },
+              "normalized_end_sec": {
+                "type": "number",
+                "minimum": 0
+              },
+              "delta_sec": {
+                "type": "number"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "annotated_duration_sec": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unannotated_duration_sec": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "segments": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "index",
+          "start_sec",
+          "end_sec",
+          "label",
+          "source_label",
+          "source_start_sec",
+          "source_end_sec"
+        ],
+        "properties": {
+          "index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "start_sec": {
+            "type": "number",
+            "minimum": 0
+          },
+          "end_sec": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "label": {
+            "enum": [
+              "bonafide",
+              "spoof",
+              "non_speech",
+              "unannotated"
+            ]
+          },
+          "source_label": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_start_sec": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "source_end_sec": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "spoof_segment_count",
+        "spoof_duration_sec",
+        "bonafide_segment_count",
+        "bonafide_duration_sec",
+        "non_speech_segment_count",
+        "non_speech_duration_sec",
+        "unannotated_segment_count",
+        "unannotated_duration_sec",
+        "spoof_ratio_total_duration",
+        "spoof_ratio_annotated_speech"
+      ],
+      "properties": {
+        "spoof_segment_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "spoof_duration_sec": {
+          "type": "number",
+          "minimum": 0
+        },
+        "bonafide_segment_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bonafide_duration_sec": {
+          "type": "number",
+          "minimum": 0
+        },
+        "non_speech_segment_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "non_speech_duration_sec": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unannotated_segment_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unannotated_duration_sec": {
+          "type": "number",
+          "minimum": 0
+        },
+        "spoof_ratio_total_duration": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "spoof_ratio_annotated_speech": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  }
+}

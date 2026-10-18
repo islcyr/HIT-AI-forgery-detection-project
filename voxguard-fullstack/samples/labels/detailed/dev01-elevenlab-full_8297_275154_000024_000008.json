@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "sample_id": "dev01-elevenlab-full_8297_275154_000024_000008",
+  "category": "fullspoof",
+  "utterance_label": "spoof",
+  "audio": {
+    "path": "samples/audio/dev01-elevenlab-full_8297_275154_000024_000008.wav",
+    "duration_sec": 4.049,
+    "sample_rate_hz": 16000,
+    "channels": 1,
+    "num_samples": 64784,
+    "bits_per_sample": 16,
+    "sha256": "278937165145aae559be1ea10935d8617c30d041a26b0aafead2e05fdd610d01"
+  },
+  "source": {
+    "dataset": "LlamaPartialSpoof",
+    "version": "1.0.b",
+    "record_url": "https://zenodo.org/records/14214149",
+    "original_id": "dev01-elevenlab-full_8297_275154_000024_000008",
+    "original_split": "not_defined",
+    "release_part": "R01TTS.0.a",
+    "speaker_id": null,
+    "reference_speaker_key": "8297",
+    "attack_id": "elevenlab",
+    "attack_name": "elevenlab",
+    "source_audio_relative_path": "R01TTS.0.a/dev01-elevenlab-full_8297_275154_000024_000008.wav",
+    "protocol_line": "dev01-elevenlab-full_8297_275154_000024_000008 4.0490 spoof 0.0000-4.0490-spoof"
+  },
+  "annotation": {
+    "status": "official_temporal_annotations",
+    "time_unit": "seconds",
+    "interval_convention": "[start,end)",
+    "origin_sec": 0,
+    "non_speech_annotation_available": false,
+    "source_file": "samples/labels/original/dev01-elevenlab-full_8297_275154_000024_000008.label.txt",
+    "source_sha256": "f41c2fea8c3e9b6268dacf1995bc6c56f5999e84a2ac077854d71be98b511fb1",
+    "source_duration_sec": 4.049,
+    "normalizations": [],
+    "annotated_duration_sec": 4.049,
+    "unannotated_duration_sec": 0.0
+  },
+  "segments": [
+    {
+      "index": 0,
+      "start_sec": 0.0,
+      "end_sec": 4.049,
+      "label": "spoof",
+      "source_label": "spoof",
+      "source_start_sec": 0.0,
+      "source_end_sec": 4.049
+    }
+  ],
+  "summary": {
+    "spoof_segment_count": 1,
+    "spoof_duration_sec": 4.049,
+    "bonafide_segment_count": 0,
+    "bonafide_duration_sec": 0.0,
+    "non_speech_segment_count": 0,
+    "non_speech_duration_sec": 0.0,
+    "unannotated_segment_count": 0,
+    "unannotated_duration_sec": 0.0,
+    "spoof_ratio_total_duration": 1.0,
+    "spoof_ratio_annotated_speech": null
+  }
+}

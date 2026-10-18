@@ -1,0 +1,128 @@
+{
+  "schema_version": "1.0",
+  "sample_id": "LA_D_1060968",
+  "category": "bonafide",
+  "utterance_label": "bonafide",
+  "audio": {
+    "path": "samples/audio/LA_D_1060968.wav",
+    "duration_sec": 4.0948125,
+    "sample_rate_hz": 16000,
+    "channels": 1,
+    "num_samples": 65517,
+    "bits_per_sample": 16,
+    "sha256": "6e97787b9e298044203ab690db68f328551c6843b55e3d3b3ac99039bbaef64e"
+  },
+  "source": {
+    "dataset": "PartialSpoof",
+    "version": "1.2",
+    "record_url": "https://zenodo.org/records/5766198",
+    "original_id": "LA_D_1060968",
+    "original_split": "dev",
+    "release_part": null,
+    "speaker_id": "LA_0108",
+    "reference_speaker_key": null,
+    "attack_id": null,
+    "attack_name": null,
+    "source_audio_relative_path": "database/dev/con_wav/LA_D_1060968.wav",
+    "protocol_line": "LA_0108 LA_D_1060968 - - bonafide"
+  },
+  "annotation": {
+    "status": "official_temporal_annotations",
+    "time_unit": "seconds",
+    "interval_convention": "[start,end)",
+    "origin_sec": 0,
+    "non_speech_annotation_available": true,
+    "source_file": "samples/labels/original/LA_D_1060968.vad",
+    "source_sha256": "6d017b2805e19aee61ae9194cd6f46931158de161e8880e003f15ca1e042527f",
+    "source_duration_sec": null,
+    "normalizations": [],
+    "annotated_duration_sec": 4.094,
+    "unannotated_duration_sec": 0.0008124999999994387
+  },
+  "segments": [
+    {
+      "index": 0,
+      "start_sec": 0.0,
+      "end_sec": 1.21,
+      "label": "non_speech",
+      "source_label": "2",
+      "source_start_sec": 0.0,
+      "source_end_sec": 1.21
+    },
+    {
+      "index": 1,
+      "start_sec": 1.21,
+      "end_sec": 2.06,
+      "label": "bonafide",
+      "source_label": "1",
+      "source_start_sec": 1.21,
+      "source_end_sec": 2.06
+    },
+    {
+      "index": 2,
+      "start_sec": 2.06,
+      "end_sec": 2.09,
+      "label": "non_speech",
+      "source_label": "2",
+      "source_start_sec": 2.06,
+      "source_end_sec": 2.09
+    },
+    {
+      "index": 3,
+      "start_sec": 2.09,
+      "end_sec": 2.44,
+      "label": "bonafide",
+      "source_label": "1",
+      "source_start_sec": 2.09,
+      "source_end_sec": 2.44
+    },
+    {
+      "index": 4,
+      "start_sec": 2.44,
+      "end_sec": 2.48,
+      "label": "non_speech",
+      "source_label": "2",
+      "source_start_sec": 2.44,
+      "source_end_sec": 2.48
+    },
+    {
+      "index": 5,
+      "start_sec": 2.48,
+      "end_sec": 3.4,
+      "label": "bonafide",
+      "source_label": "1",
+      "source_start_sec": 2.48,
+      "source_end_sec": 3.4
+    },
+    {
+      "index": 6,
+      "start_sec": 3.4,
+      "end_sec": 4.094,
+      "label": "non_speech",
+      "source_label": "2",
+      "source_start_sec": 3.4,
+      "source_end_sec": 4.094
+    },
+    {
+      "index": 7,
+      "start_sec": 4.094,
+      "end_sec": 4.0948125,
+      "label": "unannotated",
+      "source_label": null,
+      "source_start_sec": null,
+      "source_end_sec": null
+    }
+  ],
+  "summary": {
+    "spoof_segment_count": 0,
+    "spoof_duration_sec": 0.0,
+    "bonafide_segment_count": 3,
+    "bonafide_duration_sec": 2.12,
+    "non_speech_segment_count": 4,
+    "non_speech_duration_sec": 1.9740000000000002,
+    "unannotated_segment_count": 1,
+    "unannotated_duration_sec": 0.0008124999999994387,
+    "spoof_ratio_total_duration": 0.0,
+    "spoof_ratio_annotated_speech": 0.0
+  }
+}

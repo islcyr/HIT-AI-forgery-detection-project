@@ -1,0 +1,9 @@
+.venv/
+.env
+data/
+__pycache__/
+.pytest_cache/
+*.pyc
+weights/
+test-results/
+node_modules/

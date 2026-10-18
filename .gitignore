@@ -1,0 +1,80 @@
+# Local credentials and machine-specific settings
+.env
+.env.*
+!.env.example
+!.env.*.example
+/.aws/
+/.codex/
+/.agents/
+/.vscode/
+/.idea/
+*.pem
+*.key
+
+# Python environments, caches and build output
+/.envs/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+build/
+dist/
+
+# Downloaded upstream repositories, weights and local datasets
+/temp/
+/.cache/
+/audio/
+/LlamaPartialSpoof_60_samples_2026-10-17/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.wav
+*.flac
+*.mp3
+*.m4a
+*.ogg
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+
+# Inference results and service state (keep source tests and fixtures)
+/results—temp/
+/results-temp/
+/methods/*/results/
+/voxguard-fullstack/data/
+/CON_D_0000029.json
+*.log
+*.pid
+*.pid.lock
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+
+# Generated deployment configuration; retain portable examples
+/voxguard-fullstack/model_integration/cfprf-command.json
+/voxguard-fullstack/model_integration/cfprf-resident.json
+/voxguard-fullstack/model_integration/ensemble-resident.json
+
+# Frontend dependencies and generated artifacts
+node_modules/
+coverage/
+test-results/
+playwright-report/
+
+# Editor and operating-system temporary files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~

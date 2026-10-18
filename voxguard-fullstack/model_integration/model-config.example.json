@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "model_id": "replace-with-real-model-id",
+  "display_name": "待配置的真实模型",
+  "model_version": "replace-with-model-release",
+  "source_revision": "replace-with-source-commit-or-release",
+  "is_mock": false,
+  "source_dir": "./source",
+  "factory": "model_entry:create_model",
+  "model_kwargs": {},
+  "weights": "./weights/model.pt",
+  "checkpoint_sha256": "REPLACE_WITH_ACTUAL_CHECKPOINT_SHA256",
+  "state_dict_key": "state_dict",
+  "device": "cpu",
+  "input": {
+    "sample_rate_hz": 16000,
+    "channels": "mean",
+    "layout": "BT",
+    "min_duration_sec": 0.5,
+    "max_duration_sec": 120.0
+  },
+  "output": {
+    "global_key": "global_score",
+    "frame_key": "frame_scores",
+    "score_direction": "higher_is_spoof"
+  },
+  "thresholds": {
+    "detection": 0.8,
+    "localization": 0.8,
+    "version": "replace-with-source-dev-threshold-version"
+  },
+  "localization": {
+    "stride_samples": 2560,
+    "start_offset_samples": 0,
+    "frame_layout": "BT",
+    "postprocessing_version": "threshold-adjacent-merge-v1"
+  }
+}

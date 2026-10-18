@@ -1,0 +1,51 @@
+{
+  "models": [
+    {
+      "cwd": "../..",
+      "command": [
+        "bash",
+        "methods/cfprf/scripts/cfprf.sh",
+        "{audio}",
+        "--variant",
+        "HAD",
+        "--device",
+        "cuda:0",
+        "--output",
+        "{output}"
+      ],
+      "required_files": [
+        "methods/cfprf/scripts/cfprf.sh",
+        "methods/cfprf/infer_cfprf.py",
+        ".envs/cfprf/bin/python"
+      ],
+      "timeout_sec": 540,
+      "output_converter": "model_integration.cfprf_output:convert_output",
+      "converter_options": {
+        "checkpoint_variant": "HAD"
+      },
+      "descriptor": {
+        "id": "cfprf-had",
+        "version": "cfprf-had-v1-4c2ec85e82a77356",
+        "display_name": "CFPRF (HAD)",
+        "status": "ready",
+        "is_mock": false,
+        "decision_operator": "gt",
+        "capabilities": {
+          "detection": true,
+          "localization": true
+        },
+        "input": {
+          "sample_rate_hz": 16000,
+          "min_duration_sec": 0.5,
+          "max_duration_sec": 21.25
+        },
+        "localization_resolution_sec": 0.02,
+        "thresholds": {
+          "detection": 0.5,
+          "localization": 0.5,
+          "version": "cfprf-verification-gt-0.5-v1"
+        }
+      }
+    }
+  ]
+}

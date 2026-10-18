@@ -1,0 +1,136 @@
+{
+  "analysis_id": "example-localized",
+  "status": "succeeded",
+  "mode": "detect_and_localize",
+  "created_at": "2026-10-13T02:00:00Z",
+  "completed_at": "2026-10-13T02:00:02Z",
+  "expires_at": "2026-10-14T02:00:00Z",
+  "model": {
+    "id": "example-localizer",
+    "version": "example-v0.1"
+  },
+  "is_mock": true,
+  "audio": {
+    "duration_sec": 8.0,
+    "original_sample_rate_hz": 44100,
+    "original_channels": 2,
+    "analysis_sample_rate_hz": 16000,
+    "preview_url": "/api/v1/analyses/example-localized/audio"
+  },
+  "result": {
+    "decision": {
+      "label": "spoof",
+      "spoof_score": 1.6,
+      "threshold": 0.8,
+      "score_type": "uncalibrated",
+      "score_direction": "higher_is_spoof"
+    },
+    "localization": {
+      "status": "available",
+      "segments": [
+        {
+          "start_sec": 2.0,
+          "end_sec": 3.5,
+          "spoof_score": 2.2
+        },
+        {
+          "start_sec": 5.0,
+          "end_sec": 6.0,
+          "spoof_score": 1.8
+        }
+      ],
+      "resolution_sec": 0.5,
+      "threshold": 0.7,
+      "postprocessing_version": "example-postprocess-v1"
+    },
+    "timeline": [
+      {
+        "start_sec": 0.0,
+        "end_sec": 0.5,
+        "spoof_score": -1.2
+      },
+      {
+        "start_sec": 0.5,
+        "end_sec": 1.0,
+        "spoof_score": -1.2
+      },
+      {
+        "start_sec": 1.0,
+        "end_sec": 1.5,
+        "spoof_score": -1.2
+      },
+      {
+        "start_sec": 1.5,
+        "end_sec": 2.0,
+        "spoof_score": -1.2
+      },
+      {
+        "start_sec": 2.0,
+        "end_sec": 2.5,
+        "spoof_score": 2.2
+      },
+      {
+        "start_sec": 2.5,
+        "end_sec": 3.0,
+        "spoof_score": 2.2
+      },
+      {
+        "start_sec": 3.0,
+        "end_sec": 3.5,
+        "spoof_score": 2.2
+      },
+      {
+        "start_sec": 3.5,
+        "end_sec": 4.0,
+        "spoof_score": -0.8
+      },
+      {
+        "start_sec": 4.0,
+        "end_sec": 4.5,
+        "spoof_score": -0.8
+      },
+      {
+        "start_sec": 4.5,
+        "end_sec": 5.0,
+        "spoof_score": -0.8
+      },
+      {
+        "start_sec": 5.0,
+        "end_sec": 5.5,
+        "spoof_score": 1.8
+      },
+      {
+        "start_sec": 5.5,
+        "end_sec": 6.0,
+        "spoof_score": 1.8
+      },
+      {
+        "start_sec": 6.0,
+        "end_sec": 6.5,
+        "spoof_score": -0.4
+      },
+      {
+        "start_sec": 6.5,
+        "end_sec": 7.0,
+        "spoof_score": -0.4
+      },
+      {
+        "start_sec": 7.0,
+        "end_sec": 7.5,
+        "spoof_score": -0.4
+      },
+      {
+        "start_sec": 7.5,
+        "end_sec": 8.0,
+        "spoof_score": -0.4
+      }
+    ]
+  },
+  "error": null,
+  "warnings": [
+    {
+      "code": "MOCK_DATA",
+      "message": "合成接口示例，未运行真实模型。"
+    }
+  ]
+}

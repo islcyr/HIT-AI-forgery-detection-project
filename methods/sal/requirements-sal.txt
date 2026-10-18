@@ -1,0 +1,7 @@
+# Minimal inference dependencies. torch/torchaudio supplied by the py310 host.
+numpy==1.23.5
+soundfile==0.12.1
+cffi==2.1.1
+pycparser==3.11
+s3prl==0.4.18
+filelock==3.29.0

@@ -1,0 +1,578 @@
+openapi: 3.1.0
+info:
+  title: 音频伪造检测与定位 API
+  version: 0.2.0
+  description: |
+    前后端与模型适配器的 v0.2 接口约定，随本工程提供可运行服务。
+    模型目录显式返回 is_mock；模拟适配器可 ready，但必须标明模拟用途。
+    所有示例均为合成数据，不构成模型能力或性能声明。
+    分数是有限实数，越大越倾向伪造；未经概率校准，不限制为 [0,1]，不可跨模型比较。
+    所有时间区间均以原始上传音频为参照，单位秒，采用左闭右开 [start_sec,end_sec)。
+    不得通过静默截断、删除静音或改变播放速度来改变分析范围；预处理必须还原到原始时间轴。
+    v0.2 不返回部分成功结果：detect_and_localize 的定位失败使整个任务 failed。
+servers:
+  - url: /api/v1
+tags:
+  - name: models
+  - name: analyses
+paths:
+  /models:
+    get:
+      tags: [models]
+      operationId: listModels
+      summary: 查询模型能力与服务输入限制
+      responses:
+        '200':
+          description: 模型目录；真实可用模型必须显式标为 ready。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelsResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /analyses:
+    post:
+      tags: [analyses]
+      operationId: createAnalysis
+      summary: 上传音频并创建异步分析任务
+      description: |
+        file 与 model_id 必填。mode 默认 detect_and_localize。
+        选择不支持所请求能力的模型返回 422，不得静默降级为整段检测。
+        include_timeline 默认 false；detect 模式不得设为 true。
+        服务与所选模型的时长限制同时适用。上传字节限制只计算 file 本身，
+        容器格式必须根据实际内容验证，不能仅信任扩展名或客户端 MIME。
+        请求接收后才发现的解码、时长、静音或推理错误，通过 failed 任务返回。
+        空文件或解码后全部为零的纯静音返回 NO_VALID_AUDIO；近静音规则绑定模型预处理版本。
+        202 仅表示任务已创建；返回完整 AnalysisEnvelope。
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateAnalysisRequest'
+            encoding:
+              file:
+                contentType: audio/wav, audio/x-wav, audio/flac, audio/x-flac, audio/mpeg, application/octet-stream
+      responses:
+        '202':
+          description: 任务已接受，使用 analysis_id 轮询结果。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisEnvelope'
+              example:
+                analysis_id: example-queued
+                status: queued
+                mode: detect_and_localize
+                created_at: '2026-10-13T02:00:00Z'
+                completed_at: null
+                expires_at: '2026-10-14T02:00:00Z'
+                model: {id: example-localizer, version: example-v0.1}
+                is_mock: true
+                audio: null
+                result: null
+                error: null
+                warnings:
+                  - {code: MOCK_DATA, message: '合成接口示例，未运行真实模型。'}
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: model_id 不存在；error.code 为 MODEL_NOT_FOUND。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          $ref: '#/components/responses/TooLarge'
+        '415':
+          $ref: '#/components/responses/UnsupportedMedia'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /analyses/{analysis_id}:
+    parameters:
+      - $ref: '#/components/parameters/AnalysisId'
+    get:
+      tags: [analyses]
+      operationId: getAnalysis
+      summary: 轮询任务状态或获取完整结果
+      description: |
+        状态仅按 queued → running → succeeded/failed 转移，亦可 queued → failed。
+        succeeded 和 failed 为终态。任务失败仍返回 HTTP 200，失败信息位于 envelope.error。
+        建议前端从约 1 秒间隔开始轮询，并在终态、404 或 410 时停止。
+      responses:
+        '200':
+          description: 任务状态及结果。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '410':
+          $ref: '#/components/responses/Expired'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /analyses/{analysis_id}/audio:
+    parameters:
+      - $ref: '#/components/parameters/AnalysisId'
+    get:
+      tags: [analyses]
+      operationId: getAnalysisAudio
+      summary: 获取与原始时间轴一致的 WAV 预览
+      description: |
+        仅 succeeded 任务提供音频。响应为标准 WAV 预览，不保证与上传文件字节相同；
+        不删除静音、不裁剪、不变速，时长和定位时间戳须与原始音频对齐。
+        v0.2 不承诺 Range 请求或 HTTP 206 支持，客户端可以完整下载后播放。
+        queued、running、failed 均返回 409；不存在返回 404，已过期返回 410。
+      responses:
+        '200':
+          description: 原始时间轴上的可播放 WAV 音频。
+          content:
+            audio/wav:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 任务尚未成功，error.code 为 AUDIO_NOT_READY。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '410':
+          $ref: '#/components/responses/Expired'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+components:
+  parameters:
+    AnalysisId:
+      name: analysis_id
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      description: 创建任务返回的不透明标识符；所有合成示例使用 example- 前缀。
+  schemas:
+    CreateAnalysisRequest:
+      type: object
+      additionalProperties: false
+      required: [file, model_id]
+      properties:
+        file:
+          type: string
+          format: binary
+          description: WAV、FLAC 或 MP3 音频；必须满足公布的文件大小和时长限制。
+        model_id:
+          type: string
+          minLength: 1
+        mode:
+          type: string
+          enum: [detect, detect_and_localize]
+          default: detect_and_localize
+        include_timeline:
+          type: boolean
+          default: false
+          description: 仅 detect_and_localize 模式可为 true。
+      allOf:
+        - if:
+            required: [mode]
+            properties:
+              mode: {const: detect}
+          then:
+            properties:
+              include_timeline: {const: false}
+    ModelsResponse:
+      type: object
+      additionalProperties: false
+      required: [models, limits]
+      properties:
+        models:
+          type: array
+          items:
+            $ref: '#/components/schemas/Model'
+          description: 可以为空；ready 表示当前可执行，is_mock 区分模拟适配器与真实模型。
+        limits:
+          $ref: '#/components/schemas/ServiceLimits'
+    ServiceLimits:
+      type: object
+      additionalProperties: false
+      required: [accepted_formats, max_upload_bytes, min_duration_sec, max_duration_sec]
+      description: v0.2 服务限制；模型可另有更严格限制，实际适用两者交集。
+      properties:
+        accepted_formats:
+          type: array
+          const: [wav, flac, mp3]
+          items: {type: string}
+        max_upload_bytes:
+          type: integer
+          const: 20971520
+        min_duration_sec:
+          type: number
+          const: 0.5
+        max_duration_sec:
+          type: number
+          const: 120
+    Model:
+      type: object
+      additionalProperties: false
+      required: [id, version, display_name, status, is_mock, capabilities, input, localization_resolution_sec, thresholds]
+      description: |
+        version 唯一绑定权重、预处理、阈值与定位后处理配置；任一变化须更新版本。
+        status=ready 表示当前环境可执行；unavailable 模型不得接受新任务。
+        localization=false 时 localization_resolution_sec 和 thresholds.localization 必须为 null。
+        localization=true 时两者必须为数值。示例模型 id/version 使用 example- 前缀。
+        localization 能力要求带分数候选片段或逐帧/窗口分数及其原始时间映射；
+        proposal 保留候选分数，timeline_mean 使用时间加权分数；无分数区间不符合该能力。
+      properties:
+        decision_operator: {type: string, enum: [gte, gt], default: gte}
+        id: {type: string, minLength: 1}
+        version: {type: string, minLength: 1}
+        display_name: {type: string, minLength: 1}
+        status: {type: string, enum: [ready, unavailable]}
+        is_mock:
+          type: boolean
+          description: true 表示模拟联调适配器；不能作为真实检测能力展示。
+        capabilities:
+          type: object
+          additionalProperties: false
+          required: [detection, localization]
+          properties:
+            detection: {type: boolean}
+            localization: {type: boolean}
+        input:
+          type: object
+          additionalProperties: false
+          required: [sample_rate_hz, min_duration_sec, max_duration_sec]
+          description: 模型适配器的目标采样率及可处理的原始音频时长，不要求前端自行重采样。
+          properties:
+            sample_rate_hz: {type: integer, minimum: 1}
+            min_duration_sec: {type: number, exclusiveMinimum: 0}
+            max_duration_sec: {type: number, exclusiveMinimum: 0}
+        localization_resolution_sec:
+          type: [number, 'null']
+          exclusiveMinimum: 0
+        thresholds:
+          type: object
+          additionalProperties: false
+          required: [detection, localization, version]
+          properties:
+            detection: {type: number}
+            localization: {type: [number, 'null']}
+            version: {type: string, minLength: 1}
+      allOf:
+        - if:
+            properties:
+              capabilities:
+                properties:
+                  localization: {const: true}
+          then:
+            properties:
+              localization_resolution_sec: {type: number, exclusiveMinimum: 0}
+              thresholds:
+                properties:
+                  localization: {type: number}
+          else:
+            properties:
+              localization_resolution_sec: {type: 'null'}
+              thresholds:
+                properties:
+                  localization: {type: 'null'}
+    ModelRef:
+      type: object
+      additionalProperties: false
+      required: [id, version]
+      properties:
+        id: {type: string, minLength: 1}
+        version: {type: string, minLength: 1}
+    AnalysisEnvelope:
+      type: object
+      additionalProperties: false
+      required: [analysis_id, status, mode, created_at, completed_at, expires_at, model, is_mock, audio, result, error, warnings]
+      description: |
+        queued/running: completed_at、result、error 均为 null，audio 可以尚未解码而为 null。
+        succeeded: completed_at、audio、result 非 null，error=null。
+        failed: completed_at 与 error 非 null，result=null；不得把失败兜底为 bonafide。
+        expires_at 是服务承诺的保留截止时间，须晚于 created_at；终态 completed_at 不早于 created_at。
+        过期后 GET 返回 410，未知标识返回 404。示例 is_mock=true，标识符以 example- 开头。
+        真实模型计算的结果 is_mock=false；前端必须显著区分模拟与真实结果。
+      properties:
+        analysis_id: {type: string, minLength: 1}
+        status: {type: string, enum: [queued, running, succeeded, failed]}
+        mode: {type: string, enum: [detect, detect_and_localize]}
+        created_at: {type: string, format: date-time}
+        completed_at: {type: [string, 'null'], format: date-time}
+        expires_at: {type: string, format: date-time}
+        model:
+          $ref: '#/components/schemas/ModelRef'
+        is_mock: {type: boolean}
+        audio:
+          oneOf:
+            - $ref: '#/components/schemas/AudioMetadata'
+            - {type: 'null'}
+        result:
+          oneOf:
+            - $ref: '#/components/schemas/AnalysisResult'
+            - {type: 'null'}
+        error:
+          oneOf:
+            - $ref: '#/components/schemas/ErrorDetail'
+            - {type: 'null'}
+        warnings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Warning'
+      allOf:
+        - oneOf:
+            - properties:
+                status: {enum: [queued, running]}
+                completed_at: {type: 'null'}
+                result: {type: 'null'}
+                error: {type: 'null'}
+            - properties:
+                status: {const: succeeded}
+                completed_at: {type: string, format: date-time}
+                audio: {$ref: '#/components/schemas/AudioMetadata'}
+                result: {$ref: '#/components/schemas/AnalysisResult'}
+                error: {type: 'null'}
+            - properties:
+                status: {const: failed}
+                completed_at: {type: string, format: date-time}
+                result: {type: 'null'}
+                error: {$ref: '#/components/schemas/ErrorDetail'}
+        - if:
+            properties:
+              status: {const: succeeded}
+              mode: {const: detect_and_localize}
+          then:
+            properties:
+              result:
+                properties:
+                  localization:
+                    properties:
+                      status: {const: available}
+        - if:
+            properties:
+              status: {const: succeeded}
+              mode: {const: detect}
+          then:
+            properties:
+              result:
+                properties:
+                  localization:
+                    properties:
+                      status: {enum: [unsupported, not_requested]}
+                  timeline: {type: 'null'}
+    AudioMetadata:
+      type: object
+      additionalProperties: false
+      required: [duration_sec, original_sample_rate_hz, original_channels, analysis_sample_rate_hz, preview_url]
+      properties:
+        duration_sec:
+          type: number
+          minimum: 0.5
+          maximum: 120
+          description: 解码后的原始音频完整时长，含静音。
+        original_sample_rate_hz: {type: integer, minimum: 1}
+        original_channels: {type: integer, minimum: 1, maximum: 2}
+        analysis_sample_rate_hz:
+          type: integer
+          minimum: 1
+          description: 模型适配器实际使用的采样率，可与原始采样率不同。
+        preview_url:
+          type: string
+          format: uri-reference
+          description: /api/v1/analyses/{analysis_id}/audio；仅任务 succeeded 后可读取。
+    AnalysisResult:
+      type: object
+      additionalProperties: false
+      required: [decision, localization, timeline]
+      description: 整体判别与定位可以来自不同模型输出头，两者不必通过取最大值互相推导。
+      properties:
+        decision:
+          $ref: '#/components/schemas/Decision'
+        localization:
+          $ref: '#/components/schemas/Localization'
+        timeline:
+          oneOf:
+            - type: 'null'
+            - type: array
+              minItems: 1
+              items:
+                $ref: '#/components/schemas/ScoredInterval'
+          description: |
+            仅成功执行 detect_and_localize 且 include_timeline=true 时返回数组，否则为 null。
+            proposal 定位可始终返回 null，不得填造未观测区域的分数；timeline_mean 内部仍须取得完整时间分数。
+            数组由适配器整合后的时间 bin 构成，升序、互不重叠、首项从 0 开始、
+            相邻 end_sec=start_sec，末项到 duration_sec，覆盖全部有效音频时长（含静音）。
+            不直接返回模型重叠窗口；重叠预测合并、边界与补零处理规则绑定模型版本。
+            每个 bin 的分数是该区间整合后的分数；该数组属于模型预测，不属于人工真值标注。
+    Decision:
+      type: object
+      additionalProperties: false
+      required: [label, spoof_score, threshold, score_type, score_direction]
+      description: |
+        threshold_operator 默认为 gte；gt 表示严格大于阈值，gte 表示大于等于阈值。
+        这是模型判别，不是音频来源的事实认定。分数与阈值均为有限实数；
+        JSON 不允许 NaN/Infinity。未经校准，不可当作概率或跨模型比较。
+      properties:
+        label: {type: string, enum: [bonafide, spoof]}
+        spoof_score: {type: number}
+        threshold: {type: number}
+        score_type: {type: string, const: uncalibrated}
+        score_direction: {type: string, const: higher_is_spoof}
+        threshold_operator: {type: string, enum: [gte, gt], default: gte}
+        source_score_type: {type: [string, 'null'], minLength: 1}
+        decision_rule: {type: [string, 'null'], minLength: 1}
+    Localization:
+      description: |
+        available 表示定位已完成；segments=[] 表示当前阈值与后处理规则下未发现疑似片段。
+        unsupported 表示 detect 模式下所选模型没有定位能力；not_requested 表示模型支持定位，
+        但本次 mode=detect。后两种情况下 segments、resolution_sec、threshold、postprocessing_version 均为 null。
+        detect_and_localize 成功结果只能为 available；定位失败必须让整个任务 failed。
+        segments 按 start_sec 升序且不重叠，全部位于 [0,duration_sec] 内。
+        score_aggregation 默认为 timeline_mean，要求片段分数等于时间 bin 的加权均值；proposal 表示候选片段原生分数，可不提供时间线。
+        后处理可以合并短间隔，因此片段均值不一定高于阈值；规则必须绑定 postprocessing_version。
+      oneOf:
+        - type: object
+          additionalProperties: false
+          required: [status, segments, resolution_sec, threshold, postprocessing_version]
+          properties:
+            status: {type: string, const: available}
+            score_aggregation: {type: string, enum: [timeline_mean, proposal], default: timeline_mean}
+            segments:
+              type: array
+              items:
+                $ref: '#/components/schemas/ScoredInterval'
+            resolution_sec:
+              type: number
+              exclusiveMinimum: 0
+              description: 定位输出在原始时间轴上的时间分辨率，不是误差保证。
+            threshold: {type: number}
+            postprocessing_version: {type: string, minLength: 1}
+        - type: object
+          additionalProperties: false
+          required: [status, segments, resolution_sec, threshold, postprocessing_version]
+          properties:
+            status: {type: string, enum: [unsupported, not_requested]}
+            score_aggregation: {type: string, enum: [timeline_mean, proposal], default: timeline_mean}
+            segments: {type: 'null'}
+            resolution_sec: {type: 'null'}
+            threshold: {type: 'null'}
+            postprocessing_version: {type: 'null'}
+    ScoredInterval:
+      type: object
+      additionalProperties: false
+      required: [start_sec, end_sec, spoof_score]
+      description: |
+        原始音频秒级左闭右开区间，0 <= start_sec < end_sec <= audio.duration_sec。
+        数值均须有限；区间之间的顺序、覆盖及边界关系由服务显式校验，不能仅依赖 JSON Schema。
+      properties:
+        start_sec: {type: number, minimum: 0}
+        end_sec: {type: number, exclusiveMinimum: 0}
+        spoof_score: {type: number}
+    ErrorDetail:
+      type: object
+      additionalProperties: false
+      required: [code, message, retryable]
+      properties:
+        code:
+          type: string
+          minLength: 1
+          description: |
+            稳定机器可读码，例如 INVALID_REQUEST、MODEL_NOT_FOUND、MODEL_UNAVAILABLE、
+            CAPABILITY_UNSUPPORTED、INVALID_REQUEST、FILE_TOO_LARGE、UNSUPPORTED_FORMAT、
+            INVALID_AUDIO、DURATION_OUT_OF_RANGE、CHANNELS_UNSUPPORTED、NO_VALID_AUDIO、
+            INFERENCE_TIMEOUT、INFERENCE_FAILED、INVALID_MODEL_OUTPUT、ANALYSIS_NOT_FOUND、
+            ANALYSIS_EXPIRED、AUDIO_NOT_READY、QUEUE_FULL、RATE_LIMITED、
+            SERVICE_UNAVAILABLE、INTERNAL_ERROR。客户端须兼容新增 code。
+        message: {type: string, minLength: 1}
+        retryable:
+          type: boolean
+          description: 是否适合稍后以相同参数重新请求；不表示失败任务会自行恢复。
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+    Warning:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code: {type: string, minLength: 1}
+        message: {type: string, minLength: 1}
+  responses:
+    BadRequest:
+      description: 请求体或 multipart 字段格式错误；error.code=INVALID_REQUEST。
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    NotFound:
+      description: 任务不存在；error.code=ANALYSIS_NOT_FOUND。
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    TooLarge:
+      description: 上传文件超过 20971520 字节；error.code=FILE_TOO_LARGE。
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    UnsupportedMedia:
+      description: 请求或音频格式不支持；error.code=UNSUPPORTED_FORMAT。
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    Unprocessable:
+      description: |
+        字段校验失败、请求能力不支持、mode 与 include_timeline 不兼容，
+        或同步校验发现无法解码、时长超限、没有有效音频。
+        异步发现相同音频问题时通过 failed envelope.error 报告。
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    Expired:
+      description: 任务与音频已过保留期；error.code=ANALYSIS_EXPIRED。
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    TooManyRequests:
+      description: 请求过于频繁时 error.code=RATE_LIMITED；队列已满时为 QUEUE_FULL。
+      headers:
+        Retry-After:
+          description: 建议等待的秒数。
+          schema: {type: integer, minimum: 1}
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    InternalError:
+      description: 服务内部错误；error.code=INTERNAL_ERROR，不向客户端暴露堆栈或内部路径。
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    Unavailable:
+      description: 服务或所选模型当前不可用；error.code=SERVICE_UNAVAILABLE 或 MODEL_UNAVAILABLE。
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}

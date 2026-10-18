@@ -1,0 +1,41 @@
+{
+  "analysis_id": "example-detection-only",
+  "status": "succeeded",
+  "mode": "detect",
+  "created_at": "2026-10-13T02:20:00Z",
+  "completed_at": "2026-10-13T02:20:01Z",
+  "expires_at": "2026-10-14T02:20:00Z",
+  "model": {
+    "id": "example-detector",
+    "version": "example-v0.1"
+  },
+  "is_mock": true,
+  "audio": {
+    "duration_sec": 4.0,
+    "original_sample_rate_hz": 48000,
+    "original_channels": 1,
+    "analysis_sample_rate_hz": 16000,
+    "preview_url": "/api/v1/analyses/example-detection-only/audio"
+  },
+  "result": {
+    "decision": {
+      "label": "spoof",
+      "spoof_score": 1.2,
+      "threshold": 0.9,
+      "score_type": "uncalibrated",
+      "score_direction": "higher_is_spoof"
+    },
+    "localization": {
+      "status": "unsupported",
+      "segments": null,
+      "resolution_sec": null,
+      "threshold": null,
+      "postprocessing_version": null
+    },
+    "timeline": null
+  },
+  "error": null,
+  "warnings": [
+    {"code": "MOCK_DATA", "message": "合成接口示例，未运行真实模型；该示例模型仅支持整段检测。"}
+  ]
+}

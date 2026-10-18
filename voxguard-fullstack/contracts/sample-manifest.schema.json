@@ -1,0 +1,408 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Audio deepfake sample manifest v0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "sample_id",
+    "is_mock",
+    "audio_path",
+    "audio_sha256",
+    "duration_sec",
+    "sample_rate_hz",
+    "channels",
+    "language",
+    "speaker_id",
+    "source",
+    "license",
+    "preprocessing",
+    "ground_truth",
+    "notes"
+  ],
+  "properties": {
+    "sample_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "is_mock": {
+      "type": "boolean",
+      "description": "true 为格式占位示例；不得作为实际可播放或评测样本。"
+    },
+    "audio_path": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "audio_sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "duration_sec": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "sample_rate_hz": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "channels": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "language": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "speaker_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dataset",
+        "version",
+        "record_url",
+        "original_id",
+        "original_split",
+        "original_audio_sha256"
+      ],
+      "properties": {
+        "dataset": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "record_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        },
+        "original_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "original_split": {
+          "type": "string",
+          "minLength": 1
+        },
+        "original_audio_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "url",
+        "verified"
+      ],
+      "properties": {
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        },
+        "verified": {
+          "type": "boolean"
+        }
+      }
+    },
+    "preprocessing": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "交付音频相对于源文件的转换。未转换填空数组；不得丢失时间映射。"
+    },
+    "ground_truth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "utterance_label",
+        "manipulation_scope",
+        "localization_status",
+        "spoof_segments",
+        "non_speech_segments",
+        "annotation_source",
+        "annotation_sha256"
+      ],
+      "properties": {
+        "utterance_label": {
+          "enum": [
+            "bonafide",
+            "spoof",
+            "unknown"
+          ]
+        },
+        "manipulation_scope": {
+          "enum": [
+            "none",
+            "full",
+            "partial",
+            "unknown"
+          ],
+          "description": "来源明确支持时才填写 full/partial，不能从 spoof 标签推断。"
+        },
+        "localization_status": {
+          "enum": [
+            "annotated",
+            "unavailable"
+          ]
+        },
+        "spoof_segments": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/Interval"
+          }
+        },
+        "non_speech_segments": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/Interval"
+          },
+          "description": "独立保留源库非语音标注，null 表示未提供，不自动算作真实或伪造。"
+        },
+        "annotation_source": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "annotation_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "bonafide_segments": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/Interval"
+          }
+        },
+        "unannotated_segments": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/Interval"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "localization_status": {
+                "const": "unavailable"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "spoof_segments": {
+                "type": "null"
+              },
+              "non_speech_segments": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "localization_status": {
+                "const": "annotated"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "spoof_segments": {
+                "type": "array"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "utterance_label": {
+                "const": "bonafide"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "manipulation_scope": {
+                "const": "none"
+              },
+              "spoof_segments": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "utterance_label": {
+                "const": "spoof"
+              },
+              "localization_status": {
+                "const": "annotated"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "spoof_segments": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "notes": {
+      "type": "string"
+    },
+    "detailed_label_path": {
+      "type": "string",
+      "minLength": 1,
+      "description": "详细标签 JSON 路径，相对于资料包根目录。"
+    }
+  },
+  "$defs": {
+    "Interval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start_sec",
+        "end_sec"
+      ],
+      "properties": {
+        "start_sec": {
+          "type": "number",
+          "minimum": 0
+        },
+        "end_sec": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "description": "原始音频秒数的左闭右开区间。额外检查 start < end <= duration；排序且不重叠。"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "is_mock": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "audio_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "audio_sha256": {
+            "type": "string"
+          },
+          "source": {
+            "properties": {
+              "record_url": {
+                "type": "string"
+              },
+              "original_audio_sha256": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "is_mock": {
+            "const": false
+          },
+          "ground_truth": {
+            "properties": {
+              "localization_status": {
+                "const": "annotated"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "ground_truth": {
+            "properties": {
+              "annotation_source": {
+                "type": "string",
+                "minLength": 1
+              },
+              "annotation_sha256": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "description": "一行一条 JSONL。实际音频见 samples/audio，详细标签入口为 detailed_label_path。Schema 约束结构；文件哈希、时长和区间关系需另外校验。"
+}

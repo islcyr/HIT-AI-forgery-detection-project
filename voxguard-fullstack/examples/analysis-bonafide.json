@@ -1,0 +1,41 @@
+{
+  "analysis_id": "example-bonafide",
+  "status": "succeeded",
+  "mode": "detect_and_localize",
+  "created_at": "2026-10-13T02:10:00Z",
+  "completed_at": "2026-10-13T02:10:02Z",
+  "expires_at": "2026-10-14T02:10:00Z",
+  "model": {
+    "id": "example-localizer",
+    "version": "example-v0.1"
+  },
+  "is_mock": true,
+  "audio": {
+    "duration_sec": 6.0,
+    "original_sample_rate_hz": 16000,
+    "original_channels": 1,
+    "analysis_sample_rate_hz": 16000,
+    "preview_url": "/api/v1/analyses/example-bonafide/audio"
+  },
+  "result": {
+    "decision": {
+      "label": "bonafide",
+      "spoof_score": -1.1,
+      "threshold": 0.8,
+      "score_type": "uncalibrated",
+      "score_direction": "higher_is_spoof"
+    },
+    "localization": {
+      "status": "available",
+      "segments": [],
+      "resolution_sec": 0.02,
+      "threshold": 0.7,
+      "postprocessing_version": "example-postprocess-v1"
+    },
+    "timeline": null
+  },
+  "error": null,
+  "warnings": [
+    {"code": "MOCK_DATA", "message": "合成接口示例，未运行真实模型；未检出疑似片段不代表真实性保证。"}
+  ]
+}

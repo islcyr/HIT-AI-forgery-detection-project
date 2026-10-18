@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "sample_id": "dev01-cosyvoice-full_6313_66129_000092_000001",
+  "category": "fullspoof",
+  "utterance_label": "spoof",
+  "audio": {
+    "path": "samples/audio/dev01-cosyvoice-full_6313_66129_000092_000001.wav",
+    "duration_sec": 7.8831875,
+    "sample_rate_hz": 16000,
+    "channels": 1,
+    "num_samples": 126131,
+    "bits_per_sample": 16,
+    "sha256": "c6568e2ec4f116d1a7353c57f12df8acb423e0f059e30d7bc43b0ff346c002bb"
+  },
+  "source": {
+    "dataset": "LlamaPartialSpoof",
+    "version": "1.0.b",
+    "record_url": "https://zenodo.org/records/14214149",
+    "original_id": "dev01-cosyvoice-full_6313_66129_000092_000001",
+    "original_split": "not_defined",
+    "release_part": "R01TTS.0.a",
+    "speaker_id": null,
+    "reference_speaker_key": "6313",
+    "attack_id": "cosyvoice",
+    "attack_name": "cosyvoice",
+    "source_audio_relative_path": "R01TTS.0.a/dev01-cosyvoice-full_6313_66129_000092_000001.wav",
+    "protocol_line": "dev01-cosyvoice-full_6313_66129_000092_000001 7.8832 spoof 0.0000-7.8832-spoof"
+  },
+  "annotation": {
+    "status": "official_temporal_annotations",
+    "time_unit": "seconds",
+    "interval_convention": "[start,end)",
+    "origin_sec": 0,
+    "non_speech_annotation_available": false,
+    "source_file": "samples/labels/original/dev01-cosyvoice-full_6313_66129_000092_000001.label.txt",
+    "source_sha256": "4ab826c6fb6c328224ade0bf93a513b694ae51801b19f2d20648ebf7a905502a",
+    "source_duration_sec": 7.8832,
+    "normalizations": [
+      {
+        "type": "rounded_terminal_boundary_to_audio_duration",
+        "original_end_sec": 7.8832,
+        "normalized_end_sec": 7.8831875,
+        "delta_sec": -1.2500000000414957e-05,
+        "reason": "官方标签保留四位小数；完整伪造区间末端按 WAV 实测时长对齐，差值不超过 0.00005 秒。"
+      }
+    ],
+    "annotated_duration_sec": 7.8831875,
+    "unannotated_duration_sec": 0.0
+  },
+  "segments": [
+    {
+      "index": 0,
+      "start_sec": 0.0,
+      "end_sec": 7.8831875,
+      "label": "spoof",
+      "source_label": "spoof",
+      "source_start_sec": 0.0,
+      "source_end_sec": 7.8832
+    }
+  ],
+  "summary": {
+    "spoof_segment_count": 1,
+    "spoof_duration_sec": 7.8831875,
+    "bonafide_segment_count": 0,
+    "bonafide_duration_sec": 0.0,
+    "non_speech_segment_count": 0,
+    "non_speech_duration_sec": 0.0,
+    "unannotated_segment_count": 0,
+    "unannotated_duration_sec": 0.0,
+    "spoof_ratio_total_duration": 1.0,
+    "spoof_ratio_annotated_speech": null
+  }
+}

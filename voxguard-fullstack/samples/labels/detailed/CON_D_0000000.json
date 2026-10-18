@@ -1,0 +1,128 @@
+{
+  "schema_version": "1.0",
+  "sample_id": "CON_D_0000000",
+  "category": "partialspoof",
+  "utterance_label": "spoof",
+  "audio": {
+    "path": "samples/audio/CON_D_0000000.wav",
+    "duration_sec": 1.97625,
+    "sample_rate_hz": 16000,
+    "channels": 1,
+    "num_samples": 31620,
+    "bits_per_sample": 16,
+    "sha256": "8a06b6be46b864fb7f335833d7d7d748bf0b7e324c846a3efd3a91062095e1bb"
+  },
+  "source": {
+    "dataset": "PartialSpoof",
+    "version": "1.2",
+    "record_url": "https://zenodo.org/records/5766198",
+    "original_id": "CON_D_0000000",
+    "original_split": "dev",
+    "release_part": null,
+    "speaker_id": "LA_0077",
+    "reference_speaker_key": null,
+    "attack_id": "CON",
+    "attack_name": "片段拼接；具体源生成器未由该协议逐条给出",
+    "source_audio_relative_path": "database/dev/con_wav/CON_D_0000000.wav",
+    "protocol_line": "LA_0077 CON_D_0000000 - CON spoof"
+  },
+  "annotation": {
+    "status": "official_temporal_annotations",
+    "time_unit": "seconds",
+    "interval_convention": "[start,end)",
+    "origin_sec": 0,
+    "non_speech_annotation_available": true,
+    "source_file": "samples/labels/original/CON_D_0000000.vad",
+    "source_sha256": "5667285473fbc781de498eb355028b63e02653406b9350125cef822cc1e8cf74",
+    "source_duration_sec": null,
+    "normalizations": [],
+    "annotated_duration_sec": 1.9756875,
+    "unannotated_duration_sec": 0.0005625000000000213
+  },
+  "segments": [
+    {
+      "index": 0,
+      "start_sec": 0.0,
+      "end_sec": 0.69,
+      "label": "non_speech",
+      "source_label": "2",
+      "source_start_sec": 0.0,
+      "source_end_sec": 0.69
+    },
+    {
+      "index": 1,
+      "start_sec": 0.69,
+      "end_sec": 1.07,
+      "label": "bonafide",
+      "source_label": "1",
+      "source_start_sec": 0.69,
+      "source_end_sec": 1.07
+    },
+    {
+      "index": 2,
+      "start_sec": 1.07,
+      "end_sec": 1.0745625,
+      "label": "non_speech",
+      "source_label": "2",
+      "source_start_sec": 1.07,
+      "source_end_sec": 1.0745625
+    },
+    {
+      "index": 3,
+      "start_sec": 1.0745625,
+      "end_sec": 1.359125,
+      "label": "spoof",
+      "source_label": "0",
+      "source_start_sec": 1.0745625,
+      "source_end_sec": 1.359125
+    },
+    {
+      "index": 4,
+      "start_sec": 1.359125,
+      "end_sec": 1.3595625,
+      "label": "non_speech",
+      "source_label": "2",
+      "source_start_sec": 1.359125,
+      "source_end_sec": 1.3595625
+    },
+    {
+      "index": 5,
+      "start_sec": 1.3595625,
+      "end_sec": 1.8001875,
+      "label": "spoof",
+      "source_label": "0",
+      "source_start_sec": 1.3595625,
+      "source_end_sec": 1.8001875
+    },
+    {
+      "index": 6,
+      "start_sec": 1.8001875,
+      "end_sec": 1.9756875,
+      "label": "non_speech",
+      "source_label": "2",
+      "source_start_sec": 1.8001875,
+      "source_end_sec": 1.9756875
+    },
+    {
+      "index": 7,
+      "start_sec": 1.9756875,
+      "end_sec": 1.97625,
+      "label": "unannotated",
+      "source_label": null,
+      "source_start_sec": null,
+      "source_end_sec": null
+    }
+  ],
+  "summary": {
+    "spoof_segment_count": 2,
+    "spoof_duration_sec": 0.7251874999999999,
+    "bonafide_segment_count": 1,
+    "bonafide_duration_sec": 0.3800000000000001,
+    "non_speech_segment_count": 4,
+    "non_speech_duration_sec": 0.8705,
+    "unannotated_segment_count": 1,
+    "unannotated_duration_sec": 0.0005625000000000213,
+    "spoof_ratio_total_duration": 0.36695129664769127,
+    "spoof_ratio_annotated_speech": 0.6561669399988689
+  }
+}

@@ -1,0 +1,6 @@
+# WavLM-only inference; no Lightning or training dependencies required.
+numpy==1.23.5
+soundfile==0.12.1
+cffi==2.1.1
+pycparser==3.11
+s3prl==0.4.15

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#7962e8" />
+  <meta name="description" content="VoxGuard 语音真实性检测工作台，支持音频上传、检测分数和疑似伪造时间片段定位。" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./styles.css" />
+  <title>VoxGuard · 语音伪造检测</title>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar" aria-label="主导航">
+    <a href="#detect" class="brand" aria-label="VoxGuard 首页"><span class="brand-mark" data-icon="wave"></span><span>VoxGuard<small>VOICE AUTHENTICITY</small></span></a>
+    <div class="nav-label">工作空间</div>
+    <nav class="nav-links">
+      <a class="nav-item active" href="#detect" data-view="detect"><span data-icon="scan"></span>语音检测<span class="nav-active-dot"></span></a>
+      <a class="nav-item" href="#history" data-view="history"><span data-icon="history"></span>检测历史<span class="nav-count" id="history-count">0</span></a>
+      <a class="nav-item" href="#settings" data-view="settings"><span data-icon="sliders"></span>接口设置</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="environment"><span class="status-dot"></span><span id="environment-label">正在连接服务</span><small id="environment-detail">正在连接检测服务</small></div>
+      <a href="#help" class="help-link" data-view="help"><span data-icon="book"></span>使用指南<span data-icon="arrow-up-right"></span></a>
+      <a href="#settings" class="workspace-profile"><span class="avatar">V</span><span>个人工作空间<small>LOCAL WORKSPACE</small></span><span data-icon="chevron-right"></span></a>
+    </div>
+  </aside>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="icon-button menu-button" id="menu-button" aria-label="展开导航" aria-expanded="false" aria-controls="sidebar"><span data-icon="menu"></span></button>
+      <div class="breadcrumb">工作空间<span>/</span><strong id="breadcrumb-current">语音检测</strong></div>
+      <div class="topbar-right"><span class="mode-tag" id="mode-tag"><span class="status-dot"></span>服务未就绪</span><a href="#help" class="icon-button" aria-label="使用帮助"><span data-icon="help"></span></a><span class="topbar-divider"></span><span class="small-avatar" aria-label="本地用户">V</span></div>
+    </header>
+    <main id="main-content">
+      <section class="page-view" id="view-detect" aria-labelledby="page-title">
+        <div class="page-heading"><div><div class="eyebrow">VOICE DEEPFAKE DETECTION</div><h1 id="page-title">让每一段声音，回归真实<span>。</span></h1><p>音频伪造检测与时间片段定位工作台。</p></div><button class="button button-white" id="load-demo"><span data-icon="sparkles"></span>载入测试音<span data-icon="arrow-up-right"></span></button></div>
+        <div class="demo-notice" id="demo-notice" hidden><span data-icon="info"></span><span>当前为测试模式，展示的是演示结果。</span><a href="#settings">接口设置<span data-icon="arrow-right"></span></a></div>
+        <section class="card model-toolbar" aria-label="检测模式">
+          <div><label for="analysis-mode">分析范围</label><select id="analysis-mode" class="text-input" disabled><option value="detect_and_localize">真假检测＋时间片段定位</option><option value="detect">仅整段真假检测</option></select></div>
+          <button class="button button-white" id="reload-models">重新连接</button>
+          <p id="models-status" role="status">正在连接检测服务…</p>
+        </section>
+        <div class="overview-grid">
+          <section class="card upload-card" aria-labelledby="upload-title">
+            <div class="card-heading"><h2 id="upload-title"><span data-icon="audio-lines"></span>上传音频</h2><span class="quiet-text" id="upload-limit">单文件 · 最大 20 MiB</span></div>
+            <div class="dropzone" id="dropzone"><span class="upload-symbol" data-icon="upload"></span><h3>把待检测的声音放在这里</h3><p>拖拽音频文件到此处，或点击下方选择</p><button class="button button-primary" id="choose-file"><span data-icon="plus"></span>选择音频文件</button><span class="supported-formats" id="supported-formats">WAV · FLAC · MP3 · 0.5～120 秒</span><input type="file" id="file-input" accept=".wav,.flac,.mp3" hidden /></div>
+            <div class="file-row" id="file-row"><span class="file-symbol" data-icon="file-audio"></span><div class="file-info"><strong id="file-name">尚未选择音频</strong><span id="file-meta">选择音频后开始检测</span></div><button class="button button-small button-primary" id="analyze-button" disabled><span data-icon="scan"></span><span id="analyze-label">开始检测</span></button></div>
+            <div class="privacy-note"><span data-icon="shield-check"></span><span id="privacy-note">开始检测后，音频将上传至配置的服务。</span></div>
+            <p class="inline-error" id="upload-error" role="alert" hidden></p>
+            <div class="analysis-progress" id="analysis-progress" hidden><div class="progress-label"><span id="progress-text">正在准备音频…</span><span id="progress-percent">等待响应</span></div><div class="progress-track"><span id="progress-fill"></span></div><button class="text-button" id="cancel-analysis">停止等待</button></div>
+          </section>
+          <section class="card result-card" aria-labelledby="result-title" aria-live="polite">
+            <div class="card-heading"><h2 id="result-title">检测结果</h2><span class="result-state" id="result-state"><span class="status-dot"></span>等待音频检测</span></div>
+            <div class="score-area"><div class="score-ring" id="score-ring"><svg viewBox="0 0 180 180" aria-hidden="true"><circle class="ring-track" cx="90" cy="90" r="76"/><circle class="ring-value" id="ring-value" cx="90" cy="90" r="76" stroke-dasharray="477.522" stroke-dashoffset="477.522"/></svg><div class="score-number"><strong id="score-value">—</strong><span>检测分数</span></div></div><div class="score-description"><span class="risk-badge" id="risk-badge"><span class="status-dot"></span>待检测</span><h3 id="result-summary">等待音频检测</h3><p id="result-description">上传音频后开始检测。</p><span class="demo-small" id="result-demo-label" hidden></span></div></div>
+            <div class="result-stats"><div><span>疑似伪造时长</span><strong id="suspicious-duration">—</strong></div><div><span>可疑片段</span><strong id="segment-count">—</strong></div><div><span>音频总时长</span><strong id="total-duration">—</strong></div></div>
+          </section>
+        </div>
+        <section class="card waveform-card" aria-labelledby="waveform-title">
+          <div class="card-heading"><div><h2 id="waveform-title"><span data-icon="wave"></span>伪造位置分析</h2><p class="card-subtitle">从整段音频到每一个可疑瞬间</p></div><button class="button button-white button-small" id="export-report" disabled><span data-icon="download"></span>导出报告</button></div>
+          <div class="audio-toolbar"><div class="audio-controls"><button class="play-button" id="play-button" disabled aria-label="播放音频"><span data-icon="play"></span></button><div><strong id="player-file-name">尚未选择音频</strong><span class="time-display"><span id="current-time">00:00</span><span class="time-slash">/</span><span id="player-duration">--:--</span></span></div></div><div class="player-options"><span class="waveform-legend"><i></i>音频波形<i class="suspicious-dot"></i>可疑片段</span><button class="speed-button" id="speed-button" aria-label="播放速度，当前 1 倍">1×</button><button class="icon-button" id="mute-button" aria-label="静音"><span data-icon="volume"></span></button></div></div>
+          <div class="waveform-wrap" id="waveform-wrap"><div class="segment-markers" id="segment-markers"></div><div class="waveform-plot" id="waveform-plot"><svg class="waveform-svg" id="waveform-svg" viewBox="0 0 1200 112" preserveAspectRatio="none" aria-hidden="true"></svg><div class="playhead" id="playhead"></div><input type="range" id="seek-slider" min="0" max="24" value="0" step="0.01" aria-label="音频播放位置，单位秒" /></div><div class="timeline-labels" id="timeline-labels"></div></div>
+          <div class="waveform-caption"><span><span data-icon="mouse-pointer"></span>点击波形跳转，点击可疑片段试听</span><span id="audio-spec">等待可播放的音频</span></div>
+          <div class="segments-heading"><h3>可疑片段<span id="segments-heading-count">—</span></h3><span class="quiet-text">点击片段试听</span></div>
+          <div class="segment-list" id="segment-list"><p class="no-segments">开始检测后查看定位结果。</p></div><p class="result-metadata" id="result-metadata"></p><p class="result-warnings" id="result-warnings" role="status" hidden></p>
+        </section>
+        <footer class="page-footer"><span><span data-icon="shield-check"></span>为声音的真实，多一层守护</span><span>VoxGuard <i>·</i> Voice authenticity workspace</span></footer>
+      </section>
+      <section class="page-view" id="view-history" aria-labelledby="history-title" hidden><div class="page-heading"><div><div class="eyebrow">YOUR ANALYSIS LIBRARY</div><h1 id="history-title">检测历史</h1><p>本机保存最近 30 次检测的结果，不保存音频文件。</p></div><button class="button button-white" id="clear-history"><span data-icon="trash"></span>清空历史</button></div><div class="card history-card"><div class="history-table-wrap"><table class="history-table"><thead><tr><th>音频文件</th><th>检测分数</th><th>可疑片段</th><th>检测时间</th><th>操作</th></tr></thead><tbody id="history-body"></tbody></table></div><div class="empty-state" id="history-empty"><span data-icon="history"></span><h2>这里会记住你的每一次检测</h2><p>上传音频并开始检测，结果就会保存在这里。</p><a class="button button-primary" href="#detect">开始第一次检测</a></div></div></section>
+      <section class="page-view" id="view-settings" aria-labelledby="settings-title" hidden>
+        <div class="page-heading"><div><div class="eyebrow">SERVICE CONNECTION</div><h1 id="settings-title">接口设置</h1><p>配置检测服务地址。</p></div></div>
+        <form id="settings-form" class="card settings-card"><div class="card-heading"><h2><span data-icon="sliders"></span>服务连接</h2></div>
+          <label class="field-label" for="api-endpoint">API 基础地址</label><input class="text-input" id="api-endpoint" type="text" value="/api/v1" placeholder="/api/v1" autocomplete="off" spellcheck="false" aria-describedby="endpoint-help settings-error" />
+          <p class="field-help" id="endpoint-help">整合部署保持 /api/v1 即可。前后端分别部署时填写完整地址，例如 http://127.0.0.1:8000/api/v1，并在后端允许当前页面来源。</p>
+          <p class="inline-error" id="settings-error" role="alert" hidden></p><div class="settings-actions"><span><span data-icon="shield-check"></span>配置仅保存在当前浏览器</span><button class="button button-primary" type="submit"><span data-icon="check"></span>保存并连接</button></div>
+        </form>
+      </section>
+      <section class="page-view" id="view-help" aria-labelledby="help-title" hidden><div class="page-heading"><div><div class="eyebrow">GETTING STARTED</div><h1 id="help-title">使用指南</h1><p>上传音频，查看结果，试听可疑片段。</p></div></div>
+        <div class="help-grid"><article class="card help-step"><span class="step-number">01</span><span data-icon="upload"></span><h2>上传音频</h2><p>上传 WAV、FLAC 或 MP3。大小和时长限制以上传区当前提示为准。载入测试音生成非语音信号，仅供流程验证。</p></article><article class="card help-step"><span class="step-number">02</span><span data-icon="scan"></span><h2>提交分析任务</h2><p>点击开始检测，等待任务完成。停止等待仅影响当前页面，不会取消服务端任务。</p></article><article class="card help-step"><span class="step-number">03</span><span data-icon="headphones"></span><h2>查看检测结果</h2><p>查看检测结果和可疑片段。定位可用时，点击红色片段试听；检测成功后加载与原始时间轴一致的 WAV 预览。可导出检测报告。</p></article></div>
+        <article class="card help-faq"><h2>常见问题</h2><details open><summary>如何试听可疑片段？</summary><p>检测完成后，点击波形上的红色标记或下方片段卡片，即可试听对应位置。</p></details><details><summary>没有片段是否表示音频真实？</summary><p>请查看页面上的检测结论。选择「仅整段真假检测」时，不会展示片段定位。</p></details><details><summary>音频会被上传或保存吗？</summary><p>所有检测任务（包括模拟联调）都会向配置的服务上传音频。服务按结果中的到期时间清理文件；历史记录仅在浏览器保存文件信息和完整结果，不保存音频。</p></details><details><summary>刷新后还能试听历史音频吗？</summary><p>历史页仅提供报告导出，不直接播放历史音频，避免与当前上传文件混淆。重新上传音频可建立新任务和播放预览。</p></details><details><summary>服务连接失败怎么办？</summary><p>确认后端已启动，在接口设置中核对地址，再点击检测页的「重新连接」。前后端分别部署时，还需在后端允许当前前端来源。</p></details></article>
+      </section>
+    </main>
+  </div>
+  <audio id="audio-player" preload="metadata"></audio>
+  <div class="toast" id="toast" role="status" hidden><span data-icon="check-circle"></span><span id="toast-text"></span></div>
+  <dialog id="confirm-dialog"><div class="dialog-icon" data-icon="trash"></div><h2>清空检测历史？</h2><p>此操作会删除当前设备保存的所有检测记录。</p><div class="dialog-actions"><button class="button button-white" id="cancel-clear">取消</button><button class="button button-danger" id="confirm-clear">清空历史</button></div></dialog>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

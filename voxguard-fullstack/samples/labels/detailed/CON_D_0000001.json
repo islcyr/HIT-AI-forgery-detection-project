@@ -1,0 +1,146 @@
+{
+  "schema_version": "1.0",
+  "sample_id": "CON_D_0000001",
+  "category": "partialspoof",
+  "utterance_label": "spoof",
+  "audio": {
+    "path": "samples/audio/CON_D_0000001.wav",
+    "duration_sec": 5.004625,
+    "sample_rate_hz": 16000,
+    "channels": 1,
+    "num_samples": 80074,
+    "bits_per_sample": 16,
+    "sha256": "2a230462df198acfa5d431e65f9ef9da1d78123309911b8695aac9af3f4a7ab1"
+  },
+  "source": {
+    "dataset": "PartialSpoof",
+    "version": "1.2",
+    "record_url": "https://zenodo.org/records/5766198",
+    "original_id": "CON_D_0000001",
+    "original_split": "dev",
+    "release_part": null,
+    "speaker_id": "LA_0069",
+    "reference_speaker_key": null,
+    "attack_id": "CON",
+    "attack_name": "片段拼接；具体源生成器未由该协议逐条给出",
+    "source_audio_relative_path": "database/dev/con_wav/CON_D_0000001.wav",
+    "protocol_line": "LA_0069 CON_D_0000001 - CON spoof"
+  },
+  "annotation": {
+    "status": "official_temporal_annotations",
+    "time_unit": "seconds",
+    "interval_convention": "[start,end)",
+    "origin_sec": 0,
+    "non_speech_annotation_available": true,
+    "source_file": "samples/labels/original/CON_D_0000001.vad",
+    "source_sha256": "bd24c84861af54d28e1e7961a10c2f825ae1648fd5a7ffa25f36c372fe174859",
+    "source_duration_sec": null,
+    "normalizations": [],
+    "annotated_duration_sec": 5.0045625,
+    "unannotated_duration_sec": 6.250000000029843e-05
+  },
+  "segments": [
+    {
+      "index": 0,
+      "start_sec": 0.0,
+      "end_sec": 1.17,
+      "label": "non_speech",
+      "source_label": "2",
+      "source_start_sec": 0.0,
+      "source_end_sec": 1.17
+    },
+    {
+      "index": 1,
+      "start_sec": 1.17,
+      "end_sec": 1.79,
+      "label": "bonafide",
+      "source_label": "1",
+      "source_start_sec": 1.17,
+      "source_end_sec": 1.79
+    },
+    {
+      "index": 2,
+      "start_sec": 1.79,
+      "end_sec": 1.931375,
+      "label": "non_speech",
+      "source_label": "2",
+      "source_start_sec": 1.79,
+      "source_end_sec": 1.931375
+    },
+    {
+      "index": 3,
+      "start_sec": 1.931375,
+      "end_sec": 2.7176875,
+      "label": "spoof",
+      "source_label": "0",
+      "source_start_sec": 1.931375,
+      "source_end_sec": 2.7176875
+    },
+    {
+      "index": 4,
+      "start_sec": 2.7176875,
+      "end_sec": 2.7355625,
+      "label": "non_speech",
+      "source_label": "2",
+      "source_start_sec": 2.7176875,
+      "source_end_sec": 2.7355625
+    },
+    {
+      "index": 5,
+      "start_sec": 2.7355625,
+      "end_sec": 3.7055625,
+      "label": "spoof",
+      "source_label": "0",
+      "source_start_sec": 2.7355625,
+      "source_end_sec": 3.7055625
+    },
+    {
+      "index": 6,
+      "start_sec": 3.7055625,
+      "end_sec": 3.9305625,
+      "label": "non_speech",
+      "source_label": "2",
+      "source_start_sec": 3.7055625,
+      "source_end_sec": 3.9305625
+    },
+    {
+      "index": 7,
+      "start_sec": 3.9305625,
+      "end_sec": 4.5105625,
+      "label": "bonafide",
+      "source_label": "1",
+      "source_start_sec": 3.9305625,
+      "source_end_sec": 4.5105625
+    },
+    {
+      "index": 8,
+      "start_sec": 4.5105625,
+      "end_sec": 5.0045625,
+      "label": "non_speech",
+      "source_label": "2",
+      "source_start_sec": 4.5105625,
+      "source_end_sec": 5.0045625
+    },
+    {
+      "index": 9,
+      "start_sec": 5.0045625,
+      "end_sec": 5.004625,
+      "label": "unannotated",
+      "source_label": null,
+      "source_start_sec": null,
+      "source_end_sec": null
+    }
+  ],
+  "summary": {
+    "spoof_segment_count": 2,
+    "spoof_duration_sec": 1.7563125,
+    "bonafide_segment_count": 2,
+    "bonafide_duration_sec": 1.1999999999999997,
+    "non_speech_segment_count": 5,
+    "non_speech_duration_sec": 2.04825,
+    "unannotated_segment_count": 1,
+    "unannotated_duration_sec": 6.250000000029843e-05,
+    "spoof_ratio_total_duration": 0.3509378824587257,
+    "spoof_ratio_annotated_speech": 0.5940889198959853
+  }
+}
